@@ -4,7 +4,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HealthModule } from './health/health.module';
 import { DatabaseModule } from './infrastructure/database/database.module';
-
+import { PermissionsModule } from './modules/permissions/permissions.module';
+import { RolesModule } from './modules/roles/roles.module';
+import { UsersModule } from './modules/users/user.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -12,6 +14,9 @@ import { DatabaseModule } from './infrastructure/database/database.module';
     }),
     DatabaseModule,
     HealthModule,
+    PermissionsModule,
+    RolesModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

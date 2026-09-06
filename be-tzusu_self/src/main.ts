@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -10,9 +11,21 @@ async function bootstrap() {
     credentials: true,
   });
 
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('Tzusu Self API')
+    .setDescription('API documentation for the realtime chat backend')
+    .setVersion('1.0')
+    .build();
+  const swaggerDocumentFactory = () =>
+    SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, swaggerDocumentFactory, {
+    customSiteTitle: 'Tzusu Self API Docs',
+  });
+
   const port = Number(process.env.PORT) || 4000;
   await app.listen(port);
 
   console.log(`API is running on http://localhost:${port}`);
+  console.log(`Swagger docs are running on http://localhost:${port}/api/docs`);
 }
 bootstrap();
