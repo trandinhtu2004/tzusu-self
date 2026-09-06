@@ -1,0 +1,16 @@
+{
+  "name": "RealTime-Chat_MongoDB_NodeJS_Express",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:fe": "pnpm --dir fe-Tzusu_self dev",
+    "dev:be": "pnpm --dir be-Tzusu_self start:dev",
+    "dev": "pnpm --parallel dev:fe dev:be"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+
+}
