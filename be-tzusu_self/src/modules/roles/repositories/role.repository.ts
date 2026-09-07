@@ -39,11 +39,7 @@ export class RoleRepository implements IRoleRepository {
   }
 
   async createRole(role: any): Promise<any> {
-    try {
-      return this.roleModel.create(role);
-    } catch (error) {
-      throw new InternalServerErrorException('server error: ' + error);
-    }
+    return this.roleModel.create(role);
   }
 
   async attachPermissions(

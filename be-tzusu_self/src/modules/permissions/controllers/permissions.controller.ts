@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { CreatePermissionDto } from '../dto/create-permission.dto';
 import { PermissionService } from './../services/permissions.service';
 
 @ApiTags('Permissions')
@@ -13,7 +14,7 @@ export class PermissionController {
   }
 
   @Post()
-  createPermission(@Body() permission: any): Promise<any> {
+  createPermission(@Body() permission: CreatePermissionDto): Promise<any> {
     return this.permissionService.createPermission(permission);
   }
 }

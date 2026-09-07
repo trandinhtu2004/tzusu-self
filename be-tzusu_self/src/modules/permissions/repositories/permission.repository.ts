@@ -26,11 +26,15 @@ export class PermissionRepository implements IPermissionRepository {
     }
   }
 
-  async createPermission(permission: any): Promise<any> {
+  async findByIds(ids: string[]): Promise<any[]> {
     try {
-      return this.permissionModel.create(permission);
+      return this.permissionModel.find({ _id: { $in: ids } }).exec();
     } catch (error) {
       throw new InternalServerErrorException('server error: ' + error);
     }
+  }
+
+  async createPermission(permission: any): Promise<any> {
+    return this.permissionModel.create(permission);
   }
 }

@@ -1,12 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { isDuplicateKeyError } from '../../../common/utils/mongo-error';
+import { PermissionService } from '../../permissions/services/permissions.service';
+import { RolesService } from '../../roles/services/roles.service';
 import { UserRepository } from '../repositories/user.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly rolesService: RolesService,
+    private readonly permissionService: PermissionService,
+  ) {}
 
   async findById(id: string): Promise<any | null> {
-    return this.userRepository.findById(id);
+    const user = await this.userRepository.findById(id);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
   }
 
   async findByEmail(email: string): Promise<any | null> {
@@ -17,25 +30,125 @@ export class UsersService {
     return this.userRepository.findByUsername(username);
   }
 
-  async createUser(user: any): Promise<any> {
-    return this.userRepository.createUser(user);
+  async getAllUsers(): Promise<any[]> {
+    return this.userRepository.getAllUsers();
   }
 
+  async createUser(user: any): Promise<any> {
+    const existingEmail = await this.userRepository.findByEmail(user.email);
+
+    if (existingEmail) {
+      throw new ConflictException('Email already exists');
+    }
+
+    const existingUsername = await this.userRepository.findByUsername(
+      user.username,
+    );
+
+    if (existingUsername) {
+      throw new ConflictException('Username already exists');
+    }
+
+    if (user.role) {
+      await this.rolesService.findById(user.role);
+    }
+
+    await this.ensureUserPermissionsExist(user);
+    this.ensureNoPermissionOverlap(user);
+
+    try {
+      return await this.userRepository.createUser(user);
+    } catch (error) {
+      if (isDuplicateKeyError(error)) {
+        throw new ConflictException('Email or username already exists');
+      }
+
+      throw error;
+    }
+  }
+
+
   async setRole(userId: string, roleId: string): Promise<any | null> {
-    return this.userRepository.setRole(userId, roleId);
+    await this.findById(userId);
+    await this.rolesService.findById(roleId);
+
+    const user = await this.userRepository.setRole(userId, roleId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
+  async updateUser(userId: string, user: any): Promise<any | null> {
+    const updatedUser = await this.userRepository.updateUser(userId, user);
+
+    if (!updatedUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    return updatedUser;
   }
 
   async grantPermission(
     userId: string,
     permissionId: string,
   ): Promise<any | null> {
-    return this.userRepository.grantPermission(userId, permissionId);
+    await this.findById(userId);
+    await this.permissionService.ensurePermissionIdsExist([permissionId]);
+
+    const user = await this.userRepository.grantPermission(
+      userId,
+      permissionId,
+    );
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
   }
 
   async denyPermission(
     userId: string,
     permissionId: string,
   ): Promise<any | null> {
-    return this.userRepository.denyPermission(userId, permissionId);
+    await this.findById(userId);
+    await this.permissionService.ensurePermissionIdsExist([permissionId]);
+
+    const user = await this.userRepository.denyPermission(userId, permissionId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
+  private async ensureUserPermissionsExist(user: any): Promise<void> {
+    const permissionIds = [
+      ...(user.grantedPermissions ?? []),
+      ...(user.deniedPermissions ?? []),
+    ];
+
+    if (permissionIds.length) {
+      await this.permissionService.ensurePermissionIdsExist(permissionIds);
+    }
+  }
+
+  private ensureNoPermissionOverlap(user: any): void {
+    const grantedPermissions = new Set(user.grantedPermissions ?? []);
+    const deniedPermissions = user.deniedPermissions ?? [];
+
+    const hasOverlap = deniedPermissions.some((permissionId: string) =>
+      grantedPermissions.has(permissionId),
+    );
+
+    if (hasOverlap) {
+      throw new ConflictException(
+        'Permission cannot be both granted and denied',
+      );
+    }
   }
 }

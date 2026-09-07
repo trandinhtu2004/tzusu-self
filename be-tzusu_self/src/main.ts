@@ -1,3 +1,8 @@
+import {
+  BadRequestException,
+  ValidationError,
+  ValidationPipe,
+} from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
@@ -10,6 +15,21 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     credentials: true,
   });
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      exceptionFactory: (errors: ValidationError[]) =>
+        new BadRequestException({
+          message: 'Validation failed',
+          errors: errors.flatMap((error) =>
+            Object.values(error.constraints ?? {}),
+          ),
+        }),
+    }),
+  );
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Tzusu Self API')

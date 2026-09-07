@@ -39,12 +39,31 @@ export class UserRepository implements IUserRepository {
     }
   }
 
-  async createUser(user: any): Promise<any> {
+  async getAllUsers(): Promise<any[]> {
     try {
-      return this.userModel.create(user);
+      return this.userModel
+        .find()
+        .populate('role')
+        .populate('grantedPermissions')
+        .populate('deniedPermissions')
+        .sort({ createdAt: -1 })
+        .exec();
     } catch (error) {
       throw new InternalServerErrorException('server error: ' + error);
     }
+  }
+
+  async createUser(user: any): Promise<any> {
+    return this.userModel.create(user);
+  }
+
+  async updateUser(id: string, user: any): Promise<any | null> {
+    return this.userModel
+      .findByIdAndUpdate(id, user, { new: true })
+      .populate('role')
+      .populate('grantedPermissions')
+      .populate('deniedPermissions')
+      .exec();
   }
 
   async setRole(userId: string, roleId: string): Promise<any | null> {
