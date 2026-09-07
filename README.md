@@ -1,14 +1,6 @@
 # Tzusu Self
 
 Personal blog, portfolio, project showcase, and controlled chat system.
-
-Project nay duoc xay theo huong:
-
-- Public blog ve ban than, cuoc song hang ngay, project showcase.
-- User co the dang ky/dang nhap de xem noi dung sau hon.
-- Admin dieu chinh noi dung nao public, noi dung nao chi user da dang nhap moi thay.
-- Chat la tinh nang phu, chi user duoc admin cap quyen `chat:use` moi su dung duoc.
-
 ## Tech Stack
 
 Frontend:
