@@ -7,6 +7,7 @@ import {
   CreateUserData,
   PopulatedUserDocument,
   User,
+  UserDocument,
   UserPersistenceData,
 } from '../entities/user.schema';
 import { IUserRepository } from '../interfaces/user.interface';
@@ -270,13 +271,13 @@ export class UserRepository implements IUserRepository {
     };
   }
 
-   async findForAuthenticationByEmail( email: string): Promise<User | null> {
-    try{
+  async findForAuthenticationByEmail(
+    email: string,
+  ): Promise<UserDocument | null> {
+    try {
       return this.userModel.findOne({ email }).select('+passwordHash').exec();
     } catch (error) {
       throw new InternalServerErrorException('server error: ' + error);
     }
   }
-
-  
 }

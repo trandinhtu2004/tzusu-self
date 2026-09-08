@@ -35,6 +35,7 @@ async function bootstrap() {
     .setTitle('Tzusu Self API')
     .setDescription('API documentation for the realtime chat backend')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const swaggerDocumentFactory = () =>
     SwaggerModule.createDocument(app, swaggerConfig);

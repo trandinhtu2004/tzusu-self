@@ -1,15 +1,16 @@
 import {
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { isDuplicateKeyError } from '../../../common/utils/mongo-error';
 import { PermissionService } from '../../permissions/services/permissions.service';
 import { RolesService } from '../../roles/services/roles.service';
 import { CreateUserDto } from '../dto/create-user.dto';
-import { PopulatedUserDocument } from '../entities/user.schema';
+import { PopulatedUserDocument, UserDocument } from '../entities/user.schema';
+import { RegisterUserData } from '../interfaces/register-user-data.interface';
 import { UserRepository } from '../repositories/user.repository';
-import { User } from '../entities/user.schema';
 @Injectable()
 export class UsersService {
   constructor(
@@ -188,8 +189,53 @@ export class UsersService {
   }
 
   async findForAuthenticationByEmail(
-  email: string,
-): Promise<User | null> {
-  return this.userRepository.findForAuthenticationByEmail(email);
-}
+    email: string,
+  ): Promise<UserDocument | null> {
+    return this.userRepository.findForAuthenticationByEmail(email);
+  }
+
+  async registerMember(data: RegisterUserData): Promise<PopulatedUserDocument> {
+    const email = data.email.trim().toLowerCase();
+    const username = data.username.trim().toLowerCase();
+    const displayName = data.displayName.trim();
+
+    const existingEmail = await this.userRepository.findByEmail(email);
+
+    if (existingEmail) {
+      throw new ConflictException('Email already exists');
+    }
+
+    const existingUsername = await this.userRepository.findByUsername(username);
+
+    if (existingUsername) {
+      throw new ConflictException('Username already exists');
+    }
+
+    const memberRole = await this.rolesService.findByName('member');
+
+    if (!memberRole) {
+      throw new InternalServerErrorException(
+        'Default member role not found. Run seed first',
+      );
+    }
+
+    try {
+      return await this.userRepository.createUser({
+        email,
+        username,
+        passwordHash: data.passwordHash,
+        displayName,
+        role: memberRole._id.toString(),
+        status: 'active',
+        grantedPermissions: [],
+        deniedPermissions: [],
+      });
+    } catch (error) {
+      if (isDuplicateKeyError(error)) {
+        throw new ConflictException('Email or username already exists');
+      }
+
+      throw error;
+    }
+  }
 }
