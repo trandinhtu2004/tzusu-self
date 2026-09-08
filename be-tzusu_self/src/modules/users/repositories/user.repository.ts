@@ -269,4 +269,14 @@ export class UserRepository implements IUserRepository {
         : {}),
     };
   }
+
+   async findForAuthenticationByEmail( email: string): Promise<User | null> {
+    try{
+      return this.userModel.findOne({ email }).select('+passwordHash').exec();
+    } catch (error) {
+      throw new InternalServerErrorException('server error: ' + error);
+    }
+  }
+
+  
 }

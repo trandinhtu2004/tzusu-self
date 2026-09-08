@@ -9,7 +9,7 @@ import { RolesService } from '../../roles/services/roles.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { PopulatedUserDocument } from '../entities/user.schema';
 import { UserRepository } from '../repositories/user.repository';
-
+import { User } from '../entities/user.schema';
 @Injectable()
 export class UsersService {
   constructor(
@@ -186,4 +186,10 @@ export class UsersService {
   hasPermission(user: PopulatedUserDocument, permissionName: string): boolean {
     return this.getEffectivePermissionNames(user).includes(permissionName);
   }
+
+  async findForAuthenticationByEmail(
+  email: string,
+): Promise<User | null> {
+  return this.userRepository.findForAuthenticationByEmail(email);
+}
 }

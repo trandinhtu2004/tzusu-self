@@ -1,5 +1,5 @@
 import { CreateUserData, PopulatedUserDocument } from '../entities/user.schema';
-
+import {User} from '../entities/user.schema';
 export interface IUserRepository {
   findById(id: string): Promise<PopulatedUserDocument | null>;
   findByEmail(email: string): Promise<PopulatedUserDocument | null>;
@@ -22,4 +22,7 @@ export interface IUserRepository {
     userId: string,
     permissionId: string,
   ): Promise<PopulatedUserDocument | null>;
+  findForAuthenticationByEmail(
+  email: string,
+): Promise<User | null>;
 }
