@@ -1,7 +1,6 @@
 import {
   ConflictException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { isDuplicateKeyError } from '../../../common/utils/mongo-error';
@@ -194,7 +193,9 @@ export class UsersService {
     return this.userRepository.findForAuthenticationByEmail(email);
   }
 
-  async registerMember(data: RegisterUserData): Promise<PopulatedUserDocument> {
+  async registerPendingAccount(
+    data: RegisterUserData,
+  ): Promise<PopulatedUserDocument> {
     const email = data.email.trim().toLowerCase();
     const username = data.username.trim().toLowerCase();
     const displayName = data.displayName.trim();
@@ -211,22 +212,13 @@ export class UsersService {
       throw new ConflictException('Username already exists');
     }
 
-    const memberRole = await this.rolesService.findByName('member');
-
-    if (!memberRole) {
-      throw new InternalServerErrorException(
-        'Default member role not found. Run seed first',
-      );
-    }
-
     try {
       return await this.userRepository.createUser({
         email,
         username,
         passwordHash: data.passwordHash,
         displayName,
-        role: memberRole._id.toString(),
-        status: 'active',
+        status: 'pending',
         grantedPermissions: [],
         deniedPermissions: [],
       });

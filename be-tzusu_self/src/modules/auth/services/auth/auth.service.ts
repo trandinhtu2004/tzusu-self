@@ -26,7 +26,7 @@ export class AuthService {
 
   async register(dto: RegisterDto): Promise<RegisterResponse> {
     const passwordHash = await this.passwordService.hash(dto.password);
-    const user = await this.usersService.registerMember({
+    const user = await this.usersService.registerPendingAccount({
       email: dto.email,
       username: dto.username,
       passwordHash,
@@ -51,8 +51,12 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    if (authenticationUser.status !== 'active') {
-      throw new ForbiddenException('Account is not active');
+    if (authenticationUser.status === 'pending') {
+      throw new ForbiddenException('Account is awaiting admin approval');
+    }
+
+    if (authenticationUser.status === 'banned') {
+      throw new ForbiddenException('Account has been banned');
     }
 
     const user = await this.usersService.findById(

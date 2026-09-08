@@ -1,0 +1,1392 @@
+.shell {
+  --admin-bg: var(--page);
+  --admin-panel: var(--surface-raised);
+  --admin-ink: var(--ink);
+  --admin-muted: var(--muted);
+  --admin-line: var(--line);
+  --admin-green: var(--cyan);
+  --admin-green-soft: color-mix(in srgb, var(--cyan) 14%, var(--surface));
+  --admin-coral: var(--accent);
+  --admin-yellow: #d99b25;
+  --admin-field: var(--surface-soft);
+  --admin-hover: color-mix(in srgb, var(--accent) 7%, var(--admin-panel));
+  --admin-danger: var(--danger);
+  --admin-danger-soft: color-mix(in srgb, var(--danger) 12%, var(--admin-panel));
+  --admin-warning: color-mix(in srgb, var(--admin-yellow) 17%, var(--admin-panel));
+  --admin-warning-ink: color-mix(in srgb, var(--admin-yellow) 78%, var(--admin-ink));
+  background: var(--admin-bg);
+  color: var(--admin-ink);
+  display: grid;
+  grid-template-columns: 236px minmax(0, 1fr);
+  min-height: 100svh;
+}
+
+.sidebar {
+  background: #0b0f17;
+  color: #f4f5f2;
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+  left: 0;
+  padding: 0 14px 18px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.sidebarHead {
+  align-items: center;
+  border-bottom: 1px solid #25334a;
+  display: flex;
+  height: 68px;
+  justify-content: space-between;
+  padding: 0 8px;
+}
+
+.brand {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.96rem;
+  font-weight: 800;
+}
+
+.brand span {
+  color: var(--admin-coral);
+}
+
+.workspace {
+  border: 1px solid #40516c;
+  border-radius: 3px;
+  color: #aab0ac;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.58rem;
+  padding: 5px 7px;
+}
+
+.sidebarClose {
+  align-items: center;
+  background: transparent;
+  border: 1px solid #40516c;
+  border-radius: 3px;
+  color: #ffffff;
+  display: none;
+  height: 32px;
+  justify-content: center;
+  width: 32px;
+}
+
+.nav {
+  display: grid;
+  gap: 4px;
+  margin-top: 24px;
+}
+
+.nav button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  color: #9aa9bf;
+  display: grid;
+  font-size: 0.8rem;
+  font-weight: 650;
+  gap: 11px;
+  grid-template-columns: 28px 1fr auto;
+  min-height: 44px;
+  padding: 7px 10px;
+  text-align: left;
+  width: 100%;
+}
+
+.nav button > span {
+  align-items: center;
+  border: 1px solid #33445e;
+  border-radius: 3px;
+  display: flex;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.57rem;
+  height: 26px;
+  justify-content: center;
+  width: 28px;
+}
+
+.nav button:hover,
+.nav button.navActive {
+  background: #172235;
+  color: #ffffff;
+}
+
+.nav button.navActive > span {
+  background: var(--admin-coral);
+  border-color: var(--admin-coral);
+}
+
+.nav strong {
+  align-items: center;
+  background: var(--admin-coral);
+  border-radius: 10px;
+  display: flex;
+  font-size: 0.62rem;
+  height: 19px;
+  justify-content: center;
+  min-width: 19px;
+  padding: 0 5px;
+}
+
+.sidebarFoot {
+  align-items: center;
+  border-top: 1px solid #25334a;
+  color: #7f8da3;
+  display: flex;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.58rem;
+  gap: 8px;
+  margin-top: auto;
+  padding: 18px 8px 0;
+  text-transform: uppercase;
+}
+
+.prototypeDot {
+  background: #34d399;
+  border-radius: 50%;
+  height: 7px;
+  width: 7px;
+}
+
+.workspaceArea {
+  min-width: 0;
+}
+
+.topbar {
+  align-items: center;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--admin-line);
+  display: flex;
+  height: 68px;
+  justify-content: space-between;
+  padding: 0 28px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.breadcrumb {
+  align-items: center;
+  display: flex;
+  font-size: 0.72rem;
+  gap: 20px;
+}
+
+.breadcrumb span {
+  color: var(--admin-muted);
+}
+
+.breadcrumb strong {
+  position: relative;
+}
+
+.breadcrumb strong::before {
+  color: var(--admin-line);
+  content: "/";
+  left: -12px;
+  position: absolute;
+}
+
+.topActions {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.search {
+  align-items: center;
+  background: var(--admin-field);
+  border: 1px solid var(--admin-line);
+  border-radius: 4px;
+  color: var(--admin-muted);
+  display: flex;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.6rem;
+  gap: 8px;
+  height: 38px;
+  padding: 0 10px;
+  width: 210px;
+}
+
+.search input {
+  background: transparent;
+  border: 0;
+  color: var(--admin-ink);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.75rem;
+  min-width: 0;
+  outline: 0;
+  width: 100%;
+}
+
+.iconButton,
+.moreButton,
+.mobileMenu {
+  background: var(--admin-panel);
+  border: 1px solid var(--admin-line);
+  border-radius: 4px;
+  color: var(--admin-ink);
+  font-weight: 750;
+}
+
+.iconButton {
+  height: 38px;
+  width: 38px;
+}
+
+.avatar {
+  align-items: center;
+  background: var(--admin-green-soft);
+  border-radius: 50%;
+  color: var(--admin-green);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 0.66rem;
+  font-weight: 800;
+  height: 36px;
+  justify-content: center;
+  width: 36px;
+}
+
+.mobileMenu {
+  display: none;
+  height: 38px;
+  padding: 0 12px;
+}
+
+.main {
+  padding: 30px 32px 56px;
+}
+
+.pageHead {
+  align-items: end;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  margin: 0 auto 28px;
+  max-width: 1500px;
+}
+
+.eyebrow,
+.sectionLabel {
+  color: var(--admin-muted);
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.pageHead h1 {
+  font-size: 1.72rem;
+  line-height: 1.15;
+  margin: 8px 0 0;
+}
+
+.pageActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.primaryButton,
+.secondaryButton,
+.approveButton,
+.rejectButton {
+  align-items: center;
+  border-radius: 4px;
+  display: inline-flex;
+  font-size: 0.72rem;
+  font-weight: 750;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 13px;
+}
+
+.primaryButton {
+  background: var(--admin-coral);
+  border: 1px solid var(--admin-coral);
+  color: #ffffff;
+}
+
+.secondaryButton {
+  background: var(--admin-panel);
+  border: 1px solid var(--admin-line);
+  color: var(--admin-ink);
+}
+
+.panelStack,
+.overviewGrid,
+.metrics,
+.projectAdminList,
+.editorLayout,
+.chatLayout {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1500px;
+  width: 100%;
+}
+
+.panelStack {
+  display: grid;
+  gap: 20px;
+}
+
+.metrics {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.metrics article {
+  background: var(--admin-panel);
+  border: 1px solid var(--admin-line);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  min-height: 148px;
+  padding: 18px;
+}
+
+.metrics article > span {
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.metrics article > strong {
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 2.65rem;
+  font-weight: 500;
+  margin: 13px 0 auto;
+}
+
+.metrics article small {
+  color: var(--admin-muted);
+  font-size: 0.66rem;
+}
+
+.metrics article.metricAttention {
+  background: var(--admin-coral);
+  border-color: var(--admin-coral);
+  color: #ffffff;
+}
+
+.metrics article.metricAttention > span {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.metricAttention button {
+  align-self: start;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 750;
+  padding: 0 0 2px;
+}
+
+.overviewGrid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+}
+
+.surface,
+.editorPanel,
+.previewPanel,
+.conversationList,
+.messagePanel {
+  background: var(--admin-panel);
+  border: 1px solid var(--admin-line);
+  border-radius: 5px;
+}
+
+.surface {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1500px;
+  overflow: hidden;
+  padding: 20px;
+  width: 100%;
+}
+
+.surfaceHead,
+.toolbar {
+  align-items: center;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+.surfaceHead h2,
+.toolbar h2 {
+  font-size: 1rem;
+  margin: 6px 0 0;
+}
+
+.neutralBadge,
+.savedState,
+.resultCount {
+  color: var(--admin-green);
+  font-size: 0.67rem;
+  font-weight: 750;
+}
+
+.neutralBadge {
+  background: var(--admin-green-soft);
+  border-radius: 10px;
+  padding: 5px 8px;
+}
+
+.chart {
+  align-items: end;
+  border-bottom: 1px solid var(--admin-line);
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(7, 1fr);
+  height: 210px;
+  margin-top: 22px;
+  padding: 12px 10px 0;
+}
+
+.chart span {
+  background: var(--admin-green);
+  border-radius: 3px 3px 0 0;
+  min-height: 8px;
+}
+
+.chartLabels {
+  color: var(--admin-muted);
+  display: grid;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.58rem;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 8px 10px 0;
+  text-align: center;
+}
+
+.taskList {
+  border-top: 1px solid var(--admin-line);
+  display: grid;
+  margin-top: 17px;
+}
+
+.taskList button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--admin-line);
+  color: var(--admin-ink);
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 34px 1fr auto;
+  min-height: 66px;
+  padding: 8px 0;
+  text-align: left;
+}
+
+.taskList button:hover {
+  color: var(--admin-green);
+}
+
+.taskMarker {
+  align-items: center;
+  background: var(--admin-field);
+  border-radius: 4px;
+  display: flex;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.58rem;
+  height: 34px;
+  justify-content: center;
+}
+
+.taskList button > span:nth-child(2) {
+  display: grid;
+  gap: 4px;
+}
+
+.taskList strong {
+  font-size: 0.74rem;
+}
+
+.taskList small {
+  color: var(--admin-muted);
+  font-size: 0.65rem;
+}
+
+.toolbar {
+  border-bottom: 1px solid var(--admin-line);
+  margin: -20px -20px 0;
+  min-height: 68px;
+  padding: 12px 20px;
+}
+
+.segmented {
+  background: var(--admin-field);
+  border: 1px solid var(--admin-line);
+  border-radius: 4px;
+  display: inline-flex;
+  padding: 3px;
+}
+
+.segmented button {
+  background: transparent;
+  border: 0;
+  border-radius: 3px;
+  color: var(--admin-muted);
+  font-size: 0.67rem;
+  font-weight: 700;
+  min-height: 31px;
+  padding: 0 11px;
+  text-transform: capitalize;
+}
+
+.segmented button.segmentActive {
+  background: var(--admin-panel);
+  color: var(--admin-ink);
+}
+
+.tableWrap {
+  margin: 0 -20px -20px;
+  overflow-x: auto;
+}
+
+.dataTable {
+  border-collapse: collapse;
+  font-size: 0.72rem;
+  min-width: 850px;
+  width: 100%;
+}
+
+.dataTable th {
+  background: var(--admin-field);
+  color: var(--admin-muted);
+  font-size: 0.6rem;
+  font-weight: 750;
+  padding: 12px 16px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.dataTable td {
+  border-top: 1px solid var(--admin-line);
+  color: var(--admin-muted);
+  padding: 13px 16px;
+  vertical-align: middle;
+}
+
+.dataTable tbody tr:hover {
+  background: var(--admin-hover);
+}
+
+.userCell {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  min-width: 230px;
+}
+
+.userCell > span {
+  display: grid;
+  gap: 4px;
+}
+
+.userCell strong,
+.titleCell {
+  color: var(--admin-ink);
+  font-weight: 750;
+}
+
+.userCell small {
+  color: var(--admin-muted);
+  font-size: 0.62rem;
+}
+
+.status,
+.postStatus,
+.projectState {
+  border-radius: 10px;
+  display: inline-flex;
+  font-size: 0.6rem;
+  font-weight: 750;
+  padding: 5px 8px;
+  text-transform: uppercase;
+}
+
+.status.pending {
+  background: var(--admin-warning);
+  color: var(--admin-warning-ink);
+}
+
+.status.active {
+  background: var(--admin-green-soft);
+  color: var(--admin-green);
+}
+
+.status.banned {
+  background: var(--admin-danger-soft);
+  color: var(--admin-danger);
+}
+
+.rowActions {
+  display: flex;
+  gap: 6px;
+}
+
+.approveButton,
+.rejectButton {
+  min-height: 32px;
+  padding: 0 10px;
+}
+
+.approveButton {
+  background: var(--admin-green);
+  border: 1px solid var(--admin-green);
+  color: #ffffff;
+}
+
+.rejectButton {
+  background: var(--admin-panel);
+  border: 1px solid var(--admin-danger);
+  color: var(--admin-danger);
+}
+
+.moreButton {
+  min-height: 32px;
+  min-width: 36px;
+  padding: 0 8px;
+}
+
+.postStatus,
+.projectState {
+  background: var(--admin-field);
+  color: var(--admin-muted);
+}
+
+.projectAdminList {
+  border-top: 1px solid var(--admin-ink);
+}
+
+.projectAdminRow {
+  align-items: center;
+  border-bottom: 1px solid var(--admin-line);
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 42px minmax(190px, 1fr) 140px minmax(180px, 0.8fr) 40px;
+  padding: 24px 8px;
+}
+
+.projectAdminRow:hover {
+  background: var(--admin-hover);
+}
+
+.projectNumber {
+  color: var(--admin-coral);
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.68rem;
+}
+
+.projectAdminRow h2 {
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 1.45rem;
+  font-weight: 500;
+  margin: 0 0 6px;
+}
+
+.projectAdminRow p,
+.progressGroup span {
+  color: var(--admin-muted);
+  font-size: 0.66rem;
+  margin: 0;
+}
+
+.progressGroup {
+  display: grid;
+  gap: 8px;
+}
+
+.progressGroup b {
+  color: var(--admin-ink);
+}
+
+.progressTrack {
+  background: var(--admin-field);
+  height: 5px;
+  overflow: hidden;
+}
+
+.progressTrack i {
+  background: var(--admin-green);
+  display: block;
+  height: 100%;
+}
+
+.editorLayout {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(340px, 0.8fr) minmax(450px, 1.2fr);
+}
+
+.editorPanel,
+.previewPanel {
+  padding: 22px;
+}
+
+.editorPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.savedState {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+.savedState::before {
+  background: var(--admin-green);
+  border-radius: 50%;
+  content: "";
+  height: 6px;
+  width: 6px;
+}
+
+.field,
+.fieldGrid {
+  display: grid;
+  gap: 7px;
+}
+
+.field {
+  color: var(--admin-muted);
+  font-size: 0.64rem;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.field input,
+.field textarea {
+  background: var(--admin-field);
+  border: 1px solid var(--admin-line);
+  border-radius: 3px;
+  color: var(--admin-ink);
+  font-size: 0.76rem;
+  line-height: 1.5;
+  min-height: 42px;
+  padding: 10px;
+  resize: vertical;
+  text-transform: none;
+  width: 100%;
+}
+
+.fieldGrid {
+  grid-template-columns: 1fr 1fr;
+}
+
+.editorPanel > .primaryButton {
+  align-self: start;
+  margin-top: auto;
+}
+
+.previewPanel {
+  background: var(--admin-field);
+}
+
+.previewHead {
+  align-items: center;
+  color: var(--admin-muted);
+  display: flex;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.62rem;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.landingPreview {
+  aspect-ratio: 16 / 9;
+  background: var(--admin-line);
+  overflow: hidden;
+  position: relative;
+}
+
+.landingPreview img {
+  object-fit: cover;
+}
+
+.previewScrim {
+  background: var(--hero-overlay);
+  inset: 0 45% 0 0;
+  position: absolute;
+}
+
+.previewCopy {
+  display: flex;
+  flex-direction: column;
+  inset: 0 48% 0 0;
+  justify-content: center;
+  padding: 6%;
+  position: absolute;
+}
+
+.previewCopy small {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.5rem;
+}
+
+.previewCopy strong {
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 3.5rem;
+  font-weight: 500;
+  line-height: 1;
+  margin: 10px 0;
+}
+
+.previewCopy p {
+  font-size: 0.68rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.coverControls {
+  align-items: center;
+  background: var(--admin-panel);
+  display: flex;
+  justify-content: space-between;
+  padding: 13px;
+}
+
+.coverControls div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.coverControls span,
+.coverControls strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coverControls span {
+  color: var(--admin-muted);
+  font-size: 0.6rem;
+}
+
+.coverControls strong {
+  font-size: 0.69rem;
+}
+
+.mediaGrid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding-top: 20px;
+}
+
+.mediaGrid article {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.mediaImage {
+  aspect-ratio: 4 / 3;
+  background: var(--admin-field);
+  margin-bottom: 5px;
+  overflow: hidden;
+  position: relative;
+}
+
+.mediaImage img {
+  object-fit: cover;
+}
+
+.mediaImage span {
+  background: var(--admin-green);
+  border-radius: 3px;
+  bottom: 8px;
+  color: #ffffff;
+  font-size: 0.58rem;
+  font-weight: 750;
+  left: 8px;
+  padding: 5px 7px;
+  position: absolute;
+  text-transform: uppercase;
+}
+
+.mediaGrid strong {
+  font-size: 0.7rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mediaGrid small {
+  color: var(--admin-muted);
+  font-size: 0.6rem;
+}
+
+.chatLayout {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 330px minmax(0, 1fr);
+  height: min(680px, calc(100svh - 168px));
+  min-height: 520px;
+}
+
+.conversationList {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chatListHead {
+  align-items: center;
+  border-bottom: 1px solid var(--admin-line);
+  display: flex;
+  justify-content: space-between;
+  min-height: 62px;
+  padding: 0 15px;
+}
+
+.chatListHead strong {
+  font-size: 0.78rem;
+}
+
+.chatListHead span {
+  color: var(--admin-muted);
+  font-size: 0.62rem;
+}
+
+.conversationList > button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--admin-line);
+  color: var(--admin-ink);
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  min-height: 75px;
+  padding: 10px 13px;
+  position: relative;
+  text-align: left;
+}
+
+.conversationList > button.conversationActive {
+  background: var(--admin-hover);
+}
+
+.conversationList > button > span:nth-child(2) {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.conversationList > button strong,
+.conversationList > button small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conversationList > button strong {
+  font-size: 0.71rem;
+}
+
+.conversationList > button small,
+.conversationList time {
+  color: var(--admin-muted);
+  font-size: 0.6rem;
+}
+
+.conversationList > button b {
+  align-items: center;
+  background: var(--admin-coral);
+  border-radius: 50%;
+  bottom: 10px;
+  color: #ffffff;
+  display: flex;
+  font-size: 0.55rem;
+  height: 17px;
+  justify-content: center;
+  position: absolute;
+  right: 13px;
+  width: 17px;
+}
+
+.requestBox {
+  background: var(--admin-warning);
+  border-top: 1px solid var(--admin-yellow);
+  display: grid;
+  gap: 7px;
+  margin-top: auto;
+  padding: 14px;
+}
+
+.requestBox span {
+  color: var(--admin-warning-ink);
+  font-size: 0.62rem;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.requestBox strong {
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 1.8rem;
+  font-weight: 500;
+}
+
+.requestBox button {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--admin-warning-ink);
+  color: var(--admin-warning-ink);
+  font-size: 0.64rem;
+  justify-self: start;
+  padding: 0 0 2px;
+}
+
+.messagePanel {
+  display: grid;
+  grid-template-rows: 62px 1fr 68px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.messagePanel > header {
+  align-items: center;
+  border-bottom: 1px solid var(--admin-line);
+  display: flex;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+
+.messagePanel > header > div {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.messagePanel > header span {
+  display: grid;
+  gap: 3px;
+}
+
+.messagePanel > header strong {
+  font-size: 0.74rem;
+}
+
+.messagePanel > header small {
+  color: var(--admin-green);
+  font-size: 0.6rem;
+}
+
+.messages {
+  align-items: start;
+  background: var(--admin-field);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.messages time {
+  align-self: center;
+  color: var(--admin-muted);
+  font-size: 0.58rem;
+  margin-bottom: 8px;
+}
+
+.incomingMessage,
+.outgoingMessage {
+  border-radius: 5px;
+  font-size: 0.73rem;
+  line-height: 1.5;
+  max-width: min(76%, 480px);
+  padding: 10px 12px;
+}
+
+.incomingMessage {
+  background: var(--admin-panel);
+  border: 1px solid var(--admin-line);
+}
+
+.outgoingMessage {
+  align-self: end;
+  background: var(--admin-green);
+  color: #ffffff;
+}
+
+.messagePanel > footer {
+  align-items: center;
+  border-top: 1px solid var(--admin-line);
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+}
+
+.messagePanel > footer input {
+  background: var(--admin-field);
+  border: 1px solid var(--admin-line);
+  border-radius: 4px;
+  flex: 1;
+  min-width: 0;
+  padding: 10px;
+}
+
+.messagePanel > footer button {
+  background: var(--admin-coral);
+  border: 0;
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 750;
+  min-height: 38px;
+  padding: 0 16px;
+}
+
+.shell button:focus-visible,
+.shell a:focus-visible,
+.shell input:focus-visible,
+.shell textarea:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--admin-coral) 45%, transparent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1100px) {
+  .metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .overviewGrid,
+  .editorLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .projectAdminRow {
+    grid-template-columns: 36px minmax(180px, 1fr) 130px 40px;
+  }
+
+  .progressGroup {
+    grid-column: 2 / 4;
+  }
+
+  .mediaGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 800px) {
+  .shell {
+    display: block;
+  }
+
+  .sidebar {
+    box-shadow: 12px 0 34px rgba(0, 0, 0, 0.2);
+    position: fixed;
+    transform: translateX(-105%);
+    transition: transform 180ms ease;
+    width: min(82vw, 280px);
+  }
+
+  .sidebarOpen {
+    transform: translateX(0);
+  }
+
+  .sidebarOpen .workspace {
+    display: none;
+  }
+
+  .sidebarClose {
+    display: flex;
+  }
+
+  .mobileMenu {
+    display: block;
+  }
+
+  .breadcrumb span,
+  .search,
+  .topActions > .avatar {
+    display: none;
+  }
+
+  .breadcrumb strong::before {
+    display: none;
+  }
+
+  .topbar {
+    gap: 10px;
+    padding: 0 18px;
+  }
+
+  .breadcrumb {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .breadcrumb strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .topActions {
+    flex: 0 0 auto;
+  }
+
+  .main {
+    padding: 24px 18px 44px;
+  }
+
+  .chatLayout {
+    grid-template-columns: 260px minmax(420px, 1fr);
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .pageHead {
+    align-items: stretch;
+    display: grid;
+  }
+
+  .pageActions {
+    justify-content: stretch;
+  }
+
+  .pageActions > * {
+    flex: 1;
+  }
+
+  .metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .metrics article {
+    min-height: 132px;
+    padding: 14px;
+  }
+
+  .metrics article > strong {
+    font-size: 2.1rem;
+  }
+
+  .surface {
+    padding: 14px;
+  }
+
+  .toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    margin: -14px -14px 0;
+    padding: 12px 14px;
+  }
+
+  .segmented {
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  .segmented button {
+    flex: 1 0 auto;
+  }
+
+  .tableWrap {
+    margin: 0 -14px -14px;
+  }
+
+  .projectAdminRow {
+    gap: 11px;
+    grid-template-columns: 28px 1fr 36px;
+    padding: 18px 4px;
+  }
+
+  .projectState {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .progressGroup {
+    grid-column: 2 / -1;
+  }
+
+  .editorPanel,
+  .previewPanel {
+    padding: 14px;
+  }
+
+  .fieldGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .previewCopy strong {
+    font-size: 2.2rem;
+  }
+
+  .previewCopy p {
+    display: none;
+  }
+
+  .coverControls {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .mediaGrid {
+    gap: 12px;
+  }
+
+  .chatLayout {
+    display: block;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .conversationList {
+    margin-bottom: 12px;
+  }
+
+  .conversationList > button:nth-of-type(n + 3),
+  .requestBox {
+    display: none;
+  }
+
+  .messagePanel {
+    height: 500px;
+  }
+}
+
+@media (max-width: 480px) {
+  .breadcrumb,
+  .iconButton {
+    display: none;
+  }
+
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    justify-content: space-between;
+  }
+
+  .mediaGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,4 +1,4 @@
-export type UserStatus = "pending" | "active" | "blocked";
+export type UserStatus = "pending" | "active" | "banned";
 
 export interface AuthUser {
   id: string;
