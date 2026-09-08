@@ -2,15 +2,36 @@ import { randomBytes, scryptSync } from 'node:crypto';
 import { setServers } from 'node:dns';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import mongoose from 'mongoose';
-import { PermissionSchema } from '../modules/permissions/entities/permission.schema';
-import { RoleSchema } from '../modules/roles/entities/role.schema';
-import { UserSchema } from '../modules/users/entities/user.schema';
+import mongoose, { Model, Types } from 'mongoose';
+import {
+  Permission,
+  PermissionDocument,
+  PermissionSchema,
+} from '../modules/permissions/entities/permission.schema';
+import {
+  Role,
+  RoleDocument,
+  RoleSchema,
+} from '../modules/roles/entities/role.schema';
+import { User, UserSchema } from '../modules/users/entities/user.schema';
 
-type PermissionSeed = {
+interface PermissionSeed {
   name: string;
   description: string;
-};
+}
+
+type RoleSeedName = 'admin' | 'member';
+
+interface RoleSeed {
+  name: RoleSeedName;
+  description: string;
+  permissionNames: string[];
+}
+
+interface SeededRoles {
+  admin: RoleDocument;
+  member: RoleDocument;
+}
 
 const permissions: PermissionSeed[] = [
   {
@@ -75,7 +96,7 @@ const permissions: PermissionSeed[] = [
   },
 ];
 
-const roleSeeds = [
+const roleSeeds: RoleSeed[] = [
   {
     name: 'admin',
     description: 'Full access administrator.',
@@ -88,12 +109,17 @@ const roleSeeds = [
   },
 ];
 
-const PermissionModel =
-  mongoose.models.Permission || mongoose.model('Permission', PermissionSchema);
-const RoleModel = mongoose.models.Role || mongoose.model('Role', RoleSchema);
-const UserModel = mongoose.models.User || mongoose.model('User', UserSchema);
+const PermissionModel: Model<Permission> =
+  (mongoose.models.Permission as Model<Permission> | undefined) ??
+  mongoose.model<Permission>('Permission', PermissionSchema);
+const RoleModel: Model<Role> =
+  (mongoose.models.Role as Model<Role> | undefined) ??
+  mongoose.model<Role>('Role', RoleSchema);
+const UserModel: Model<User> =
+  (mongoose.models.User as Model<User> | undefined) ??
+  mongoose.model<User>('User', UserSchema);
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
   loadEnv();
   configureDnsServers();
   validateSeedEnv();
@@ -110,15 +136,15 @@ async function bootstrap() {
   console.log(`Roles: ${Object.keys(roles).join(', ')}`);
 }
 
-function validateSeedEnv() {
+function validateSeedEnv(): void {
   requiredEnv('MONGODB_URI');
   requiredEnv('SEED_ADMIN_EMAIL');
   requiredEnv('SEED_ADMIN_USERNAME');
   requiredEnv('SEED_ADMIN_PASSWORD');
 }
 
-async function seedPermissions() {
-  const docs = [];
+async function seedPermissions(): Promise<PermissionDocument[]> {
+  const docs: PermissionDocument[] = [];
 
   for (const permission of permissions) {
     const doc = await PermissionModel.findOneAndUpdate(
@@ -127,26 +153,35 @@ async function seedPermissions() {
       { new: true, upsert: true, setDefaultsOnInsert: true },
     ).exec();
 
+    if (!doc) {
+      throw new Error(`Could not seed permission: ${permission.name}`);
+    }
+
     docs.push(doc);
   }
 
   return docs;
 }
 
-async function seedRoles(permissionDocs: any[]) {
+async function seedRoles(
+  permissionDocs: PermissionDocument[],
+): Promise<SeededRoles> {
   const permissionByName = new Map(
-    permissionDocs.map((permission) => [
-      permission.name as string,
-      permission._id,
-    ]),
+    permissionDocs.map((permission) => [permission.name, permission._id]),
   );
 
-  const roles: Record<string, any> = {};
+  const roles = new Map<RoleSeedName, RoleDocument>();
 
   for (const role of roleSeeds) {
-    const permissionIds = role.permissionNames.map((name) =>
-      permissionByName.get(name),
-    );
+    const permissionIds = role.permissionNames.map((name) => {
+      const permissionId = permissionByName.get(name);
+
+      if (!permissionId) {
+        throw new Error(`Permission was not seeded: ${name}`);
+      }
+
+      return permissionId;
+    });
 
     const doc = await RoleModel.findOneAndUpdate(
       { name: role.name },
@@ -160,13 +195,24 @@ async function seedRoles(permissionDocs: any[]) {
       { new: true, upsert: true, setDefaultsOnInsert: true },
     ).exec();
 
-    roles[role.name] = doc;
+    if (!doc) {
+      throw new Error(`Could not seed role: ${role.name}`);
+    }
+
+    roles.set(role.name, doc);
   }
 
-  return roles as { admin: any; member: any };
+  const admin = roles.get('admin');
+  const member = roles.get('member');
+
+  if (!admin || !member) {
+    throw new Error('Could not seed required roles');
+  }
+
+  return { admin, member };
 }
 
-async function seedAdmin(adminRoleId: mongoose.Types.ObjectId) {
+async function seedAdmin(adminRoleId: Types.ObjectId): Promise<void> {
   const email = requiredEnv('SEED_ADMIN_EMAIL').toLowerCase();
   const username = requiredEnv('SEED_ADMIN_USERNAME');
   const displayName = process.env.SEED_ADMIN_DISPLAY_NAME || 'Tzusu Admin';
@@ -206,14 +252,14 @@ async function seedAdmin(adminRoleId: mongoose.Types.ObjectId) {
   console.log(`Admin created: ${email}`);
 }
 
-function hashPassword(password: string) {
+function hashPassword(password: string): string {
   const salt = randomBytes(16).toString('hex');
   const hash = scryptSync(password, salt, 64).toString('hex');
 
   return `scrypt$${salt}$${hash}`;
 }
 
-function loadEnv() {
+function loadEnv(): void {
   const envPath = resolve(process.cwd(), '.env');
 
   if (!existsSync(envPath)) {
@@ -238,7 +284,7 @@ function loadEnv() {
   }
 }
 
-function configureDnsServers() {
+function configureDnsServers(): void {
   const dnsServers = process.env.NODE_DNS_SERVERS?.split(',')
     .map((server) => server.trim())
     .filter(Boolean);
@@ -248,7 +294,7 @@ function configureDnsServers() {
   }
 }
 
-function requiredEnv(name: string) {
+function requiredEnv(name: string): string {
   const value = process.env[name];
 
   if (!value) {

@@ -1,11 +1,25 @@
+import { CreateUserData, PopulatedUserDocument } from '../entities/user.schema';
+
 export interface IUserRepository {
-  findById(id: string): Promise<any | null>;
-  findByEmail(email: string): Promise<any | null>;
-  findByUsername(username: string): Promise<any | null>;
-  getAllUsers(): Promise<any[]>;
-  createUser(user: any): Promise<any>;
-  updateUser(id: string, user: any): Promise<any | null>;
-  setRole(userId: string, roleId: string): Promise<any | null>;
-  grantPermission(userId: string, permissionId: string): Promise<any | null>;
-  denyPermission(userId: string, permissionId: string): Promise<any | null>;
+  findById(id: string): Promise<PopulatedUserDocument | null>;
+  findByEmail(email: string): Promise<PopulatedUserDocument | null>;
+  findByUsername(username: string): Promise<PopulatedUserDocument | null>;
+  getAllUsers(): Promise<PopulatedUserDocument[]>;
+  createUser(user: CreateUserData): Promise<PopulatedUserDocument>;
+  updateUser(
+    id: string,
+    user: CreateUserData,
+  ): Promise<PopulatedUserDocument | null>;
+  setRole(
+    userId: string,
+    roleId: string,
+  ): Promise<PopulatedUserDocument | null>;
+  grantPermission(
+    userId: string,
+    permissionId: string,
+  ): Promise<PopulatedUserDocument | null>;
+  denyPermission(
+    userId: string,
+    permissionId: string,
+  ): Promise<PopulatedUserDocument | null>;
 }

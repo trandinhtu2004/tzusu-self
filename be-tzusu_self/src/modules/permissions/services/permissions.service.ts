@@ -1,16 +1,22 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { isDuplicateKeyError } from '../../../common/utils/mongo-error';
+import { CreatePermissionDto } from '../dto/create-permission.dto';
+import { PermissionDocument } from '../entities/permission.schema';
 import { PermissionRepository } from '../repositories/permission.repository';
 
 @Injectable()
 export class PermissionService {
   constructor(private readonly permissionRepository: PermissionRepository) {}
 
-  async getAllPermissions(): Promise<any[]> {
+  async getAllPermissions(): Promise<PermissionDocument[]> {
     return this.permissionRepository.findAll();
   }
 
-  async findByName(name: string): Promise<any | null> {
+  async findByName(name: string): Promise<PermissionDocument | null> {
     return this.permissionRepository.findByName(name);
   }
 
@@ -23,7 +29,9 @@ export class PermissionService {
     }
   }
 
-  async createPermission(permission: any): Promise<any> {
+  async createPermission(
+    permission: CreatePermissionDto,
+  ): Promise<PermissionDocument> {
     const existingPermission = await this.permissionRepository.findByName(
       permission.name,
     );

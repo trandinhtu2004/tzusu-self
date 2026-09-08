@@ -1,6 +1,13 @@
+import {
+  CreatePermissionData,
+  PermissionDocument,
+} from '../entities/permission.schema';
+
 export interface IPermissionRepository {
-  findAll(): Promise<any[]>;
-  findByName(name: string): Promise<any | null>;
-  findByIds(ids: string[]): Promise<any[]>;
-  createPermission(permission: any): Promise<any>;
+  findAll(): Promise<PermissionDocument[]>;
+  findByName(name: string): Promise<PermissionDocument | null>;
+  findByIds(ids: string[]): Promise<PermissionDocument[]>;
+  createPermission(
+    permission: CreatePermissionData,
+  ): Promise<PermissionDocument>;
 }

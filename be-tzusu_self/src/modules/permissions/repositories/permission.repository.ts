@@ -1,16 +1,21 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import {
+  CreatePermissionData,
+  Permission,
+  PermissionDocument,
+} from '../entities/permission.schema';
 import { IPermissionRepository } from '../interfaces/permission.interface';
 
 @Injectable()
 export class PermissionRepository implements IPermissionRepository {
   constructor(
     @InjectModel('Permission')
-    private readonly permissionModel: Model<any>,
+    private readonly permissionModel: Model<Permission>,
   ) {}
 
-  async findAll(): Promise<any[]> {
+  async findAll(): Promise<PermissionDocument[]> {
     try {
       return this.permissionModel.find().sort({ name: 1 }).exec();
     } catch (error) {
@@ -18,7 +23,7 @@ export class PermissionRepository implements IPermissionRepository {
     }
   }
 
-  async findByName(name: string): Promise<any | null> {
+  async findByName(name: string): Promise<PermissionDocument | null> {
     try {
       return this.permissionModel.findOne({ name }).exec();
     } catch (error) {
@@ -26,7 +31,7 @@ export class PermissionRepository implements IPermissionRepository {
     }
   }
 
-  async findByIds(ids: string[]): Promise<any[]> {
+  async findByIds(ids: string[]): Promise<PermissionDocument[]> {
     try {
       return this.permissionModel.find({ _id: { $in: ids } }).exec();
     } catch (error) {
@@ -34,7 +39,9 @@ export class PermissionRepository implements IPermissionRepository {
     }
   }
 
-  async createPermission(permission: any): Promise<any> {
+  async createPermission(
+    permission: CreatePermissionData,
+  ): Promise<PermissionDocument> {
     return this.permissionModel.create(permission);
   }
 }

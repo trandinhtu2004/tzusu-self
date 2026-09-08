@@ -1,51 +1,111 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
+import { PermissionDocument } from '../../permissions/entities/permission.schema';
+import { PopulatedRoleDocument } from '../../roles/entities/role.schema';
+import {
+  CreateUserData,
+  PopulatedUserDocument,
+  User,
+  UserPersistenceData,
+} from '../entities/user.schema';
 import { IUserRepository } from '../interfaces/user.interface';
 
 @Injectable()
 export class UserRepository implements IUserRepository {
   constructor(
     @InjectModel('User')
-    private readonly userModel: Model<any>,
+    private readonly userModel: Model<User>,
   ) {}
 
-  async findById(id: string): Promise<any | null> {
+  async findById(id: string): Promise<PopulatedUserDocument | null> {
     try {
-      return this.userModel
+      return await this.userModel
         .findById(id)
-        .populate('role')
-        .populate('grantedPermissions')
-        .populate('deniedPermissions')
+        .populate<{ role: PopulatedRoleDocument | null }>({
+          path: 'role',
+          populate: {
+            path: 'permissions',
+            model: 'Permission',
+          },
+        })
+        .populate<{ grantedPermissions: PermissionDocument[] }>(
+          'grantedPermissions',
+        )
+        .populate<{ deniedPermissions: PermissionDocument[] }>(
+          'deniedPermissions',
+        )
         .exec();
     } catch (error) {
       throw new InternalServerErrorException('server error: ' + error);
     }
   }
 
-  async findByEmail(email: string): Promise<any | null> {
+  async findByEmail(email: string): Promise<PopulatedUserDocument | null> {
     try {
-      return this.userModel.findOne({ email }).populate('role').exec();
+      return await this.userModel
+        .findOne({ email })
+        .populate<{ role: PopulatedRoleDocument | null }>({
+          path: 'role',
+          populate: {
+            path: 'permissions',
+            model: 'Permission',
+          },
+        })
+        .populate<{ grantedPermissions: PermissionDocument[] }>(
+          'grantedPermissions',
+        )
+        .populate<{ deniedPermissions: PermissionDocument[] }>(
+          'deniedPermissions',
+        )
+        .exec();
     } catch (error) {
       throw new InternalServerErrorException('server error: ' + error);
     }
   }
 
-  async findByUsername(username: string): Promise<any | null> {
+  async findByUsername(
+    username: string,
+  ): Promise<PopulatedUserDocument | null> {
     try {
-      return this.userModel.findOne({ username }).populate('role').exec();
+      return await this.userModel
+        .findOne({ username })
+        .populate<{ role: PopulatedRoleDocument | null }>({
+          path: 'role',
+          populate: {
+            path: 'permissions',
+            model: 'Permission',
+          },
+        })
+        .populate<{ grantedPermissions: PermissionDocument[] }>(
+          'grantedPermissions',
+        )
+        .populate<{ deniedPermissions: PermissionDocument[] }>(
+          'deniedPermissions',
+        )
+        .exec();
     } catch (error) {
       throw new InternalServerErrorException('server error: ' + error);
     }
   }
 
-  async getAllUsers(): Promise<any[]> {
+  async getAllUsers(): Promise<PopulatedUserDocument[]> {
     try {
-      return this.userModel
+      return await this.userModel
         .find()
-        .populate('role')
-        .populate('grantedPermissions')
-        .populate('deniedPermissions')
+        .populate<{ role: PopulatedRoleDocument | null }>({
+          path: 'role',
+          populate: {
+            path: 'permissions',
+            model: 'Permission',
+          },
+        })
+        .populate<{ grantedPermissions: PermissionDocument[] }>(
+          'grantedPermissions',
+        )
+        .populate<{ deniedPermissions: PermissionDocument[] }>(
+          'deniedPermissions',
+        )
         .sort({ createdAt: -1 })
         .exec();
     } catch (error) {
@@ -53,24 +113,56 @@ export class UserRepository implements IUserRepository {
     }
   }
 
-  async createUser(user: any): Promise<any> {
-    return this.userModel.create(user);
+  async createUser(user: CreateUserData): Promise<PopulatedUserDocument> {
+    const createdUser = await this.userModel.create(
+      this.toPersistenceData(user),
+    );
+
+    return this.populateUser(createdUser._id.toString());
   }
 
-  async updateUser(id: string, user: any): Promise<any | null> {
-    return this.userModel
-      .findByIdAndUpdate(id, user, { new: true })
-      .populate('role')
-      .populate('grantedPermissions')
-      .populate('deniedPermissions')
+  async updateUser(
+    id: string,
+    user: CreateUserData,
+  ): Promise<PopulatedUserDocument | null> {
+    return await this.userModel
+      .findByIdAndUpdate(id, this.toPersistenceData(user), { new: true })
+      .populate<{ role: PopulatedRoleDocument | null }>({
+        path: 'role',
+        populate: {
+          path: 'permissions',
+          model: 'Permission',
+        },
+      })
+      .populate<{ grantedPermissions: PermissionDocument[] }>(
+        'grantedPermissions',
+      )
+      .populate<{ deniedPermissions: PermissionDocument[] }>(
+        'deniedPermissions',
+      )
       .exec();
   }
 
-  async setRole(userId: string, roleId: string): Promise<any | null> {
+  async setRole(
+    userId: string,
+    roleId: string,
+  ): Promise<PopulatedUserDocument | null> {
     try {
-      return this.userModel
+      return await this.userModel
         .findByIdAndUpdate(userId, { role: roleId }, { new: true })
-        .populate('role')
+        .populate<{ role: PopulatedRoleDocument | null }>({
+          path: 'role',
+          populate: {
+            path: 'permissions',
+            model: 'Permission',
+          },
+        })
+        .populate<{ grantedPermissions: PermissionDocument[] }>(
+          'grantedPermissions',
+        )
+        .populate<{ deniedPermissions: PermissionDocument[] }>(
+          'deniedPermissions',
+        )
         .exec();
     } catch (error) {
       throw new InternalServerErrorException('server error: ' + error);
@@ -80,9 +172,9 @@ export class UserRepository implements IUserRepository {
   async grantPermission(
     userId: string,
     permissionId: string,
-  ): Promise<any | null> {
+  ): Promise<PopulatedUserDocument | null> {
     try {
-      return this.userModel
+      return await this.userModel
         .findByIdAndUpdate(
           userId,
           {
@@ -91,8 +183,19 @@ export class UserRepository implements IUserRepository {
           },
           { new: true },
         )
-        .populate('grantedPermissions')
-        .populate('deniedPermissions')
+        .populate<{ role: PopulatedRoleDocument | null }>({
+          path: 'role',
+          populate: {
+            path: 'permissions',
+            model: 'Permission',
+          },
+        })
+        .populate<{ grantedPermissions: PermissionDocument[] }>(
+          'grantedPermissions',
+        )
+        .populate<{ deniedPermissions: PermissionDocument[] }>(
+          'deniedPermissions',
+        )
         .exec();
     } catch (error) {
       throw new InternalServerErrorException('server error: ' + error);
@@ -102,9 +205,9 @@ export class UserRepository implements IUserRepository {
   async denyPermission(
     userId: string,
     permissionId: string,
-  ): Promise<any | null> {
+  ): Promise<PopulatedUserDocument | null> {
     try {
-      return this.userModel
+      return await this.userModel
         .findByIdAndUpdate(
           userId,
           {
@@ -113,11 +216,57 @@ export class UserRepository implements IUserRepository {
           },
           { new: true },
         )
-        .populate('grantedPermissions')
-        .populate('deniedPermissions')
+        .populate<{ role: PopulatedRoleDocument | null }>({
+          path: 'role',
+          populate: {
+            path: 'permissions',
+            model: 'Permission',
+          },
+        })
+        .populate<{ grantedPermissions: PermissionDocument[] }>(
+          'grantedPermissions',
+        )
+        .populate<{ deniedPermissions: PermissionDocument[] }>(
+          'deniedPermissions',
+        )
         .exec();
     } catch (error) {
       throw new InternalServerErrorException('server error: ' + error);
     }
+  }
+
+  private async populateUser(id: string): Promise<PopulatedUserDocument> {
+    const user = await this.findById(id);
+
+    if (!user) {
+      throw new InternalServerErrorException(
+        'User was created but could not be loaded',
+      );
+    }
+
+    return user;
+  }
+
+  private toPersistenceData(user: CreateUserData): UserPersistenceData {
+    const { role, grantedPermissions, deniedPermissions, ...fields } = user;
+
+    return {
+      ...fields,
+      ...(role !== undefined ? { role: new Types.ObjectId(role) } : {}),
+      ...(grantedPermissions !== undefined
+        ? {
+            grantedPermissions: grantedPermissions.map(
+              (permissionId) => new Types.ObjectId(permissionId),
+            ),
+          }
+        : {}),
+      ...(deniedPermissions !== undefined
+        ? {
+            deniedPermissions: deniedPermissions.map(
+              (permissionId) => new Types.ObjectId(permissionId),
+            ),
+          }
+        : {}),
+    };
   }
 }

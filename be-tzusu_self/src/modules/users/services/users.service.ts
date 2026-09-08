@@ -1,7 +1,13 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { isDuplicateKeyError } from '../../../common/utils/mongo-error';
 import { PermissionService } from '../../permissions/services/permissions.service';
 import { RolesService } from '../../roles/services/roles.service';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { PopulatedUserDocument } from '../entities/user.schema';
 import { UserRepository } from '../repositories/user.repository';
 
 @Injectable()
@@ -12,7 +18,7 @@ export class UsersService {
     private readonly permissionService: PermissionService,
   ) {}
 
-  async findById(id: string): Promise<any | null> {
+  async findById(id: string): Promise<PopulatedUserDocument> {
     const user = await this.userRepository.findById(id);
 
     if (!user) {
@@ -22,19 +28,21 @@ export class UsersService {
     return user;
   }
 
-  async findByEmail(email: string): Promise<any | null> {
+  async findByEmail(email: string): Promise<PopulatedUserDocument | null> {
     return this.userRepository.findByEmail(email);
   }
 
-  async findByUsername(username: string): Promise<any | null> {
+  async findByUsername(
+    username: string,
+  ): Promise<PopulatedUserDocument | null> {
     return this.userRepository.findByUsername(username);
   }
 
-  async getAllUsers(): Promise<any[]> {
+  async getAllUsers(): Promise<PopulatedUserDocument[]> {
     return this.userRepository.getAllUsers();
   }
 
-  async createUser(user: any): Promise<any> {
+  async createUser(user: CreateUserDto): Promise<PopulatedUserDocument> {
     const existingEmail = await this.userRepository.findByEmail(user.email);
 
     if (existingEmail) {
@@ -67,8 +75,10 @@ export class UsersService {
     }
   }
 
-
-  async setRole(userId: string, roleId: string): Promise<any | null> {
+  async setRole(
+    userId: string,
+    roleId: string,
+  ): Promise<PopulatedUserDocument> {
     await this.findById(userId);
     await this.rolesService.findById(roleId);
 
@@ -81,7 +91,10 @@ export class UsersService {
     return user;
   }
 
-  async updateUser(userId: string, user: any): Promise<any | null> {
+  async updateUser(
+    userId: string,
+    user: CreateUserDto,
+  ): Promise<PopulatedUserDocument> {
     const updatedUser = await this.userRepository.updateUser(userId, user);
 
     if (!updatedUser) {
@@ -94,7 +107,7 @@ export class UsersService {
   async grantPermission(
     userId: string,
     permissionId: string,
-  ): Promise<any | null> {
+  ): Promise<PopulatedUserDocument> {
     await this.findById(userId);
     await this.permissionService.ensurePermissionIdsExist([permissionId]);
 
@@ -113,7 +126,7 @@ export class UsersService {
   async denyPermission(
     userId: string,
     permissionId: string,
-  ): Promise<any | null> {
+  ): Promise<PopulatedUserDocument> {
     await this.findById(userId);
     await this.permissionService.ensurePermissionIdsExist([permissionId]);
 
@@ -126,7 +139,7 @@ export class UsersService {
     return user;
   }
 
-  private async ensureUserPermissionsExist(user: any): Promise<void> {
+  private async ensureUserPermissionsExist(user: CreateUserDto): Promise<void> {
     const permissionIds = [
       ...(user.grantedPermissions ?? []),
       ...(user.deniedPermissions ?? []),
@@ -137,7 +150,7 @@ export class UsersService {
     }
   }
 
-  private ensureNoPermissionOverlap(user: any): void {
+  private ensureNoPermissionOverlap(user: CreateUserDto): void {
     const grantedPermissions = new Set(user.grantedPermissions ?? []);
     const deniedPermissions = user.deniedPermissions ?? [];
 
@@ -150,5 +163,27 @@ export class UsersService {
         'Permission cannot be both granted and denied',
       );
     }
+  }
+
+  getEffectivePermissionNames(user: PopulatedUserDocument): string[] {
+    if (user.status !== 'active') {
+      return [];
+    }
+
+    const deniedPermissionNames = new Set(
+      user.deniedPermissions.map((permission) => permission.name),
+    );
+    const allowedPermissionNames = [
+      ...(user.role?.permissions ?? []),
+      ...user.grantedPermissions,
+    ].map((permission) => permission.name);
+
+    return [...new Set(allowedPermissionNames)].filter(
+      (permissionName) => !deniedPermissionNames.has(permissionName),
+    );
+  }
+
+  hasPermission(user: PopulatedUserDocument, permissionName: string): boolean {
+    return this.getEffectivePermissionNames(user).includes(permissionName);
   }
 }

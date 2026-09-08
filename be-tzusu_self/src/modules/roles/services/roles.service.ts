@@ -1,6 +1,12 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { isDuplicateKeyError } from '../../../common/utils/mongo-error';
 import { PermissionService } from '../../permissions/services/permissions.service';
+import { CreateRoleDto } from '../dto/create-role.dto';
+import { PopulatedRoleDocument } from '../entities/role.schema';
 import { RoleRepository } from '../repositories/role.repository';
 
 @Injectable()
@@ -10,11 +16,11 @@ export class RolesService {
     private readonly permissionService: PermissionService,
   ) {}
 
-  async findAll(): Promise<any[]> {
+  async findAll(): Promise<PopulatedRoleDocument[]> {
     return this.roleRepository.findAll();
   }
 
-  async findById(id: string): Promise<any | null> {
+  async findById(id: string): Promise<PopulatedRoleDocument> {
     const role = await this.roleRepository.findById(id);
 
     if (!role) {
@@ -24,11 +30,11 @@ export class RolesService {
     return role;
   }
 
-  async findByName(name: string): Promise<any | null> {
+  async findByName(name: string): Promise<PopulatedRoleDocument | null> {
     return this.roleRepository.findByName(name);
   }
 
-  async createRole(role: any): Promise<any> {
+  async createRole(role: CreateRoleDto): Promise<PopulatedRoleDocument> {
     const existingRole = await this.roleRepository.findByName(role.name);
 
     if (existingRole) {
@@ -53,7 +59,7 @@ export class RolesService {
   async attachPermissions(
     roleId: string,
     permissionIds: string[],
-  ): Promise<any | null> {
+  ): Promise<PopulatedRoleDocument> {
     await this.findById(roleId);
     await this.permissionService.ensurePermissionIdsExist(permissionIds);
 

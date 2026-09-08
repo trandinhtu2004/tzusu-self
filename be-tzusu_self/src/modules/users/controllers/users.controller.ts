@@ -4,6 +4,7 @@ import { MongoIdPipe } from '../../../common/pipes/mongo-id.pipe';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { PermissionIdDto } from '../dto/permission-id.dto';
 import { SetRoleDto } from '../dto/set-role.dto';
+import { PopulatedUserDocument } from '../entities/user.schema';
 import { UsersService } from '../services/users.service';
 
 @ApiTags('Users')
@@ -12,22 +13,26 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get(':id')
-  findById(@Param('id', MongoIdPipe) id: string): Promise<any | null> {
+  findById(
+    @Param('id', MongoIdPipe) id: string,
+  ): Promise<PopulatedUserDocument> {
     return this.usersService.findById(id);
   }
 
   @Post()
-  createUser(@Body() user: CreateUserDto): Promise<any> {
+  createUser(@Body() user: CreateUserDto): Promise<PopulatedUserDocument> {
     return this.usersService.createUser(user);
   }
 
   @Get()
-  getAllUsers(): Promise<any[]> {
+  getAllUsers(): Promise<PopulatedUserDocument[]> {
     return this.usersService.getAllUsers();
   }
 
   @Get('email/:email')
-  findByEmail(@Param('email') email: string): Promise<any | null> {
+  findByEmail(
+    @Param('email') email: string,
+  ): Promise<PopulatedUserDocument | null> {
     return this.usersService.findByEmail(email);
   }
 
@@ -35,7 +40,7 @@ export class UsersController {
   updateUser(
     @Param('id', MongoIdPipe) id: string,
     @Body() user: CreateUserDto,
-  ): Promise<any | null> {
+  ): Promise<PopulatedUserDocument> {
     return this.usersService.updateUser(id, user);
   }
 
@@ -43,7 +48,7 @@ export class UsersController {
   setRole(
     @Param('id', MongoIdPipe) id: string,
     @Body() body: SetRoleDto,
-  ): Promise<any | null> {
+  ): Promise<PopulatedUserDocument> {
     return this.usersService.setRole(id, body.roleId);
   }
 
@@ -51,7 +56,7 @@ export class UsersController {
   grantPermission(
     @Param('id', MongoIdPipe) id: string,
     @Body() body: PermissionIdDto,
-  ): Promise<any | null> {
+  ): Promise<PopulatedUserDocument> {
     return this.usersService.grantPermission(id, body.permissionId);
   }
 
@@ -59,7 +64,7 @@ export class UsersController {
   denyPermission(
     @Param('id', MongoIdPipe) id: string,
     @Body() body: PermissionIdDto,
-  ): Promise<any | null> {
+  ): Promise<PopulatedUserDocument> {
     return this.usersService.denyPermission(id, body.permissionId);
   }
 }
